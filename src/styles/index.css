@@ -1,13 +1,14 @@
+/* Font imports: Merriweather (serif) + Source Sans 3 (sans-serif) */
+@import url("https://fonts.googleapis.com/css2?family=Merriweather:wght@400;700&family=Source+Sans+3:wght@300;400;600;700&display=swap");
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 :root {
-  color: #1f2937;
-  background: #f6f7f9;
-  font-family:
-    Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
-    sans-serif;
+  color: #2c1a24;
+  background: #f5f0e8;
+  font-family: "Source Sans 3", "Inter", ui-sans-serif, system-ui, sans-serif;
 }
 
 body {
@@ -17,6 +18,17 @@ body {
 }
 
 button,
-input {
+input,
+select,
+textarea {
   font: inherit;
+}
+
+/* Brand utility: section titles with serif font */
+.section-title {
+  font-family: "Merriweather", Georgia, serif;
+  font-size: 26px;
+  color: #7b1a4b;
+  font-weight: 700;
+  margin-bottom: 20px;
 }

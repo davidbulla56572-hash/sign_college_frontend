@@ -22,12 +22,6 @@ SPA para el sistema inteligente de evaluacion de aspirantes docentes.
 npm install
 ```
 
-En PowerShell, si `npm` esta bloqueado por politicas de ejecucion, usa:
-
-```bash
-npm.cmd install
-```
-
 2. Copiar `.env.example` a `.env` si necesitas cambiar la URL del backend.
 3. Levantar el servidor local:
 
@@ -37,20 +31,79 @@ npm run dev
 
 La aplicacion queda disponible en `http://localhost:5173`.
 
-## Base tecnica de Fase 2
+## Scripts
 
-- Router con rutas publicas y privadas.
-- Rutas iniciales: `/login`, `/dashboard`, `/perfil`, `/resultados` y `/admin`.
-- `QueryClientProvider`, Toastify y Axios centralizado.
-- Store de sesion con Zustand.
-- Componentes base: Button, Input, Card, PageContainer, Spinner, EmptyState y ErrorState.
-- Estructura por features preparada para auth, hoja de vida, resultados, admin y convocatorias.
+| Comando | Descripcion |
+|---------|-------------|
+| `npm run dev` | Servidor de desarrollo |
+| `npm run build` | Build de produccion |
+| `npm run typecheck` | Verificacion de tipos |
+| `npm run preview` | Preview del build |
 
-## Flujo funcional de Fase 3
+## Estructura
 
-- Login con Formik, Yup, TanStack Query y Toastify.
-- Sesion persistida en Zustand con `isAuthenticated`, token y usuario.
-- Axios adjunta `Authorization: Bearer <token>` en solicitudes autenticadas.
-- La sesion persistida se valida contra `/api/v1/auth/me`.
-- `/login` redirige si ya existe sesion activa.
-- Rutas privadas y ruta `/admin` protegida por rol.
+```
+src/
+├── app/              # Router, providers, store
+├── components/ui/    # Componentes base reutilizables
+├── features/         # Modulos por dominio
+│   ├── admin/        # Panel administrativo
+│   ├── auth/         # Autenticacion y sesion
+│   ├── convocatorias/
+│   ├── dashboard/    # Dashboard aspirante
+│   ├── hoja-vida/    # Carga y edicion de CV
+│   ├── postulaciones/
+│   ├── profile/      # Perfil de usuario
+│   └── resultados/   # Resultados y ranking
+├── layouts/          # Layouts publico y privado
+├── lib/              # HTTP client, utilidades
+└── styles/           # CSS global (Tailwind)
+```
+
+## Endpoints del frontend
+
+### Aspirante
+| Ruta | Descripcion |
+|------|-------------|
+| `/login` | Inicio de sesion |
+| `/dashboard` | Vista general de estado y postulaciones |
+| `/convocatorias` | Convocatorias activas disponibles |
+| `/hoja-vida` | Carga de CV y edicion de datos |
+| `/perfil` | Datos personales |
+| `/resultados` | Resultados de evaluacion con desglose |
+
+### Administrador
+| Ruta | Descripcion |
+|------|-------------|
+| `/admin` | Panel con 4 tabs: Aspirantes, Postulaciones, Ranking, Convocatorias |
+
+## Funcionalidades implementadas
+
+### Autenticacion
+- Login con Formik + Yup + TanStack Query
+- Persistencia de sesion en localStorage (Zustand)
+- Redireccion por rol (Admin -> /admin, Aspirante -> /dashboard)
+- Cierre de sesion automatico en 401
+
+### Hoja de Vida
+- Upload PDF/DOCX con react-dropzone (max 10MB)
+- Edicion de datos personales e items por seccion
+- Secciones dinamicas: Formacion, Experiencia, Produccion, Ponencias, Investigacion
+- Guardado y opcion de enviar postulacion
+
+### Resultados
+- Vista de resultados con puntaje total y desglose
+- Detalle expandible por tipo de item
+- Estados visuales: loading, empty, error
+
+### Dashboard Admin
+- **Aspirantes**: lista con busqueda y detalle
+- **Postulaciones**: tabla con estado y puntaje
+- **Ranking**: tabla con filtros, busqueda y ordenamiento
+- **Convocatorias**: crear, activar/cerrar
+
+## Proteccion de rutas
+
+- Rutas publicas: `/login` (redirige si autenticado)
+- Rutas privadas: todas las demas (redirige a `/login` si no autenticado)
+- Rutas admin: `/admin` (solo rol ADMIN)

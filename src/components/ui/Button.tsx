@@ -2,17 +2,20 @@ import type { ButtonHTMLAttributes } from "react";
 
 import { cn } from "../../lib/utils/cn";
 
-type ButtonVariant = "primary" | "secondary" | "ghost";
+type ButtonVariant = "primary" | "secondary" | "ghost" | "outline-white";
 
 type ButtonProps = ButtonHTMLAttributes<HTMLButtonElement> & {
   variant?: ButtonVariant;
 };
 
 const variants: Record<ButtonVariant, string> = {
-  primary: "bg-brand-700 text-white hover:bg-brand-600 focus-visible:ring-brand-600",
+  primary:
+    "bg-brand-primary text-white border-2 border-brand-primary hover:bg-brand-primaryDark focus-visible:ring-brand-primary",
   secondary:
-    "border border-gray-300 bg-white text-gray-800 hover:bg-gray-50 focus-visible:ring-brand-600",
-  ghost: "text-gray-700 hover:bg-gray-100 focus-visible:ring-brand-600"
+    "border-2 border-border bg-cream text-ink-mid hover:bg-brand-veryPale focus-visible:ring-brand-primary",
+  ghost: "text-ink-mid hover:bg-brand-veryPale focus-visible:ring-brand-primary",
+  "outline-white":
+    "bg-transparent text-white border-2 border-white hover:bg-white/15 focus-visible:ring-white/50",
 };
 
 export function Button({
@@ -25,7 +28,7 @@ export function Button({
     <button
       type={type}
       className={cn(
-        "inline-flex min-h-10 items-center justify-center gap-2 rounded-md px-4 py-2 text-sm font-semibold transition focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-60",
+        "inline-flex items-center justify-center gap-2 rounded-brand-sm px-10 py-4 font-bold transition focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-60",
         variants[variant],
         className
       )}

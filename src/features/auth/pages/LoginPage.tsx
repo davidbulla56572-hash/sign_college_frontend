@@ -1,4 +1,4 @@
-import { GraduationCap } from "lucide-react";
+import { Link } from "react-router-dom";
 
 import { LoginForm } from "../components/LoginForm";
 import { useLoginMutation } from "../hooks/useLoginMutation";
@@ -7,39 +7,66 @@ export function LoginPage() {
   const loginMutation = useLoginMutation();
 
   return (
-    <main className="grid min-h-screen bg-[#f6f7f9] lg:grid-cols-[minmax(0,1fr)_460px]">
-      <section className="flex min-h-[42vh] items-end bg-[linear-gradient(135deg,#0e7490_0%,#0f766e_52%,#3f3f46_100%)] p-8 text-white lg:min-h-screen lg:p-12">
-        <div className="max-w-2xl space-y-5">
-          <div className="inline-flex h-12 w-12 items-center justify-center rounded-md bg-white/15">
-            <GraduationCap className="h-7 w-7" aria-hidden="true" />
-          </div>
-          <div>
-            <p className="text-sm font-semibold uppercase tracking-[0.18em] text-cyan-100">
-              Sign College
-            </p>
-            <h1 className="mt-3 max-w-xl text-3xl font-semibold leading-tight sm:text-4xl">
-              Evaluacion docente con trazabilidad desde la hoja de vida.
+    <main className="flex min-h-screen w-full">
+      {/* Left panel: login form */}
+      <section className="flex flex-1 flex-col items-center justify-center bg-cream px-8 py-16 sm:px-12 lg:px-[120px]">
+        <div className="w-full max-w-[500px]">
+          {/* Branding */}
+          <div className="mb-12 flex flex-col items-center gap-1.5 text-center">
+            <div className="flex h-[110px] w-[110px] items-center justify-center">
+              <img
+                src="/logo_ucaldas.png"
+                alt="Logo Universidad de Caldas"
+                className="h-20 w-20 object-contain"
+              />
+            </div>
+            <h1 className="font-serif text-[30px] font-bold text-brand-primary">
+              Universidad de Caldas
             </h1>
+            <p className="text-base text-ink-mid">Sistema de Aspirantes Docentes</p>
           </div>
-          <p className="max-w-xl text-base text-cyan-50">
-            Convocatorias, postulaciones y resultados en un solo entorno.
-          </p>
-        </div>
-      </section>
-      <section className="flex items-center justify-center px-4 py-10 sm:px-6">
-        <div className="w-full max-w-md rounded-md border border-gray-200 bg-white p-6 shadow-soft sm:p-8">
-          <div className="mb-6">
-            <h2 className="text-2xl font-semibold text-ink">Iniciar sesion</h2>
-            <p className="mt-2 text-sm text-gray-600">
-              Usa tus credenciales de aspirante o administrador.
-            </p>
-          </div>
+
+          <p className="mb-6 text-base text-ink-mid">Use su correo y contraseña</p>
+
           <LoginForm
-            errorMessage={loginMutation.error ? "Credenciales invalidas o servicio no disponible" : undefined}
+            errorMessage={
+              loginMutation.error
+                ? "Credenciales invalidas o servicio no disponible"
+                : undefined
+            }
             isPending={loginMutation.isPending}
             onSubmit={(values) => loginMutation.mutate(values)}
           />
+
+          <div className="mt-4 text-center">
+            <Link to="/registro" className="cursor-pointer text-sm text-brand-primary underline">
+              ¿No tienes cuenta? Registrate aqui
+            </Link>
+          </div>
         </div>
+      </section>
+
+      {/* Right panel: maroon circle branding */}
+      <section className="hidden items-center justify-center bg-brand-primary lg:flex lg:w-[500px] xl:w-[750px]">
+        <div className="relative z-10 text-center text-white">
+          <h2 className="mb-6 font-serif text-[46px] leading-tight">¡Bienvenido!</h2>
+          <p className="mb-10 text-lg leading-relaxed text-white/85">
+            Ingrese sus datos personales para usar
+            <br />
+            todas las funciones del sitio
+          </p>
+          <Link
+            to="/registro"
+            className="inline-flex items-center justify-center rounded-brand-sm border-2 border-white px-12 py-4 text-lg font-bold text-white transition hover:bg-white/15"
+          >
+            Registrarse
+          </Link>
+        </div>
+        {/* Decorative circle element */}
+        <div
+          className="absolute -bottom-[180px] -left-[180px] h-[480px] w-[480px] rounded-full"
+          style={{ background: "rgba(255, 255, 255, 0.08)" }}
+        />
       </section>
     </main>
   );
