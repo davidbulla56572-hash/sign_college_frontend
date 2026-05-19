@@ -36,7 +36,7 @@ export function LoginForm({ errorMessage, isPending, onSubmit }: LoginFormProps)
             name="email"
             type="email"
             autoComplete="email"
-            placeholder="aspirante@correo.com"
+            placeholder="aspirante@signcollege.com"
             value={values.email}
             onBlur={handleBlur}
             onChange={handleChange}
