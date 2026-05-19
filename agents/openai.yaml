@@ -1,0 +1,3 @@
+interface:
+  display_name: "Frontend React Platform"
+  short_description: "React + TypeScript + Tailwind architecture with Formik, Yup, Zustand, Query, Axios, and Toastify-first patterns."
