@@ -1,6 +1,7 @@
 import { Navigate, Route, Routes } from "react-router-dom";
 
 import { ProtectedRoute } from "./ProtectedRoute";
+import { PublicOnlyRoute } from "./PublicOnlyRoute";
 import { AdminPage } from "../../features/admin/pages/AdminPage";
 import { LoginPage } from "../../features/auth/pages/LoginPage";
 import { DashboardPage } from "../../features/dashboard/pages/DashboardPage";
@@ -12,8 +13,10 @@ import { PublicLayout } from "../../layouts/PublicLayout";
 export function AppRouter() {
   return (
     <Routes>
-      <Route element={<PublicLayout />}>
-        <Route path="/login" element={<LoginPage />} />
+      <Route element={<PublicOnlyRoute />}>
+        <Route element={<PublicLayout />}>
+          <Route path="/login" element={<LoginPage />} />
+        </Route>
       </Route>
       <Route element={<ProtectedRoute />}>
         <Route element={<AppLayout />}>

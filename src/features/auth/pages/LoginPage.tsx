@@ -35,6 +35,7 @@ export function LoginPage() {
             </p>
           </div>
           <LoginForm
+            errorMessage={loginMutation.error ? "Credenciales invalidas o servicio no disponible" : undefined}
             isPending={loginMutation.isPending}
             onSubmit={(values) => loginMutation.mutate(values)}
           />

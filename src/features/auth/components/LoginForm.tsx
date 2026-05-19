@@ -7,6 +7,7 @@ import { loginSchema } from "../schemas/login.schema";
 import type { LoginPayload } from "../types/auth.types";
 
 type LoginFormProps = {
+  errorMessage?: string;
   isPending: boolean;
   onSubmit: (values: LoginPayload) => void;
 };
@@ -16,7 +17,7 @@ const initialValues: LoginPayload = {
   password: ""
 };
 
-export function LoginForm({ isPending, onSubmit }: LoginFormProps) {
+export function LoginForm({ errorMessage, isPending, onSubmit }: LoginFormProps) {
   return (
     <Formik
       initialValues={initialValues}
@@ -25,6 +26,11 @@ export function LoginForm({ isPending, onSubmit }: LoginFormProps) {
     >
       {({ errors, handleBlur, handleChange, touched, values }) => (
         <Form className="space-y-5" noValidate>
+          {errorMessage ? (
+            <div className="rounded-md border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700">
+              {errorMessage}
+            </div>
+          ) : null}
           <Input
             label="Correo"
             name="email"
