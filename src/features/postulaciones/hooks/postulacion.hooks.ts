@@ -45,11 +45,23 @@ export function useUploadCvMutation(postulacionId: number) {
 
   return useMutation({
     mutationFn: (file: File) => uploadCvWithinPostulacion(postulacionId, file),
-    onSuccess: () => {
+    onSuccess: (data) => {
       void queryClient.invalidateQueries({
         queryKey: ["hoja-vida", "draft", postulacionId],
       });
-      toast.success("Hoja de vida procesada correctamente");
+      if (data.metadata_extraccion.origen !== "gemini") {
+        const warning =
+          data.metadata_extraccion.warnings[0] ??
+          "La extraccion IA no uso Gemini y se aplico un fallback.";
+        toast.warning(warning);
+        return;
+      }
+
+      if (data.metadata_extraccion.warnings.length > 0) {
+        toast.info(data.metadata_extraccion.warnings[0]);
+      } else {
+        toast.success("Hoja de vida procesada correctamente con Gemini");
+      }
     },
     onError: () => {
       toast.error("Error al procesar la hoja de vida");

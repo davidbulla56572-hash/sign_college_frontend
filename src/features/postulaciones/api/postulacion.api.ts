@@ -5,7 +5,10 @@ import type {
   HojaVidaDraftResponse,
   PostulacionSummary,
 } from "../types/postulacion.types";
-import type { HojaVidaSavePayload } from "../../hoja-vida/types/hojaVida.types";
+import type {
+  HojaVidaProcesadaResponse,
+  HojaVidaSavePayload,
+} from "../../hoja-vida/types/hojaVida.types";
 
 export async function listMyPostulaciones(): Promise<PostulacionSummary[]> {
   const response = await httpClient.get("/postulaciones/mine");
@@ -29,14 +32,15 @@ export async function getHojaVidaDraft(
 export async function uploadCvWithinPostulacion(
   postulacionId: number,
   file: File
-): Promise<void> {
+): Promise<HojaVidaProcesadaResponse> {
   const formData = new FormData();
   formData.append("file", file);
-  await httpClient.post(
+  const response = await httpClient.post(
     `/hoja-vida/postulaciones/${postulacionId}/upload`,
     formData,
     { headers: { "Content-Type": "multipart/form-data" } }
   );
+  return response.data;
 }
 
 export async function saveHojaVidaDraft(

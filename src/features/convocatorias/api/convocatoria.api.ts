@@ -23,8 +23,11 @@ export const convocatoriasApi = {
     id: number,
     payload: ConvocatoriaUpdatePayload,
   ): Promise<ConvocatoriaDetail> =>
-    httpClient.patch(`/convocatorias/${id}`, payload).then((r) => r.data),
+    httpClient.put(`/convocatorias/${id}`, payload).then((r) => r.data),
 
-  toggle: (id: number): Promise<ConvocatoriaDetail> =>
-    httpClient.post(`/convocatorias/${id}/toggle`).then((r) => r.data),
+  activate: (id: number): Promise<ConvocatoriaDetail> =>
+    httpClient.patch(`/convocatorias/${id}/activate`).then((r) => r.data),
+
+  close: (id: number): Promise<ConvocatoriaDetail> =>
+    httpClient.patch(`/convocatorias/${id}/close`).then((r) => r.data),
 };

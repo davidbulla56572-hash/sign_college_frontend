@@ -77,7 +77,11 @@ function AspiranteDashboard() {
               </div>
             </div>
             {!hasPostulacion && (
-              <Button type="button" variant="primary" onClick={() => navigate("/hoja-vida")}>
+              <Button
+                type="button"
+                variant="primary"
+                onClick={() => navigate("/mi-postulacion")}
+              >
                 Iniciar postulacion
               </Button>
             )}
@@ -103,8 +107,8 @@ function AspiranteDashboard() {
                 ? "Sin archivo cargado"
                 : "No hay convocatoria activa",
             icon: FileText,
-            action: hasActiveConvocatoria ? "/hoja-vida" : undefined,
-            actionLabel: hasActiveConvocatoria ? "Ir a hoja de vida" : undefined,
+            action: hasActiveConvocatoria ? "/mi-postulacion" : undefined,
+            actionLabel: hasActiveConvocatoria ? "Ir a mi postulacion" : undefined,
           },
           {
             title: "Postulaciones",
@@ -114,7 +118,7 @@ function AspiranteDashboard() {
                 ? "Sin postulacion creada"
                 : "No hay convocatoria activa",
             icon: ClipboardList,
-            action: hasActiveConvocatoria && !hasPostulacion ? "/hoja-vida" : undefined,
+            action: hasActiveConvocatoria && !hasPostulacion ? "/mi-postulacion" : undefined,
             actionLabel: hasActiveConvocatoria && !hasPostulacion ? "Iniciar postulacion" : undefined,
           },
           {
@@ -175,7 +179,11 @@ function AspiranteDashboard() {
                     <td className="px-5 py-3 text-sm text-gray-700">{p.puntaje_total != null ? p.puntaje_total.toFixed(2) : "—"}</td>
                     <td className="px-5 py-3 text-sm text-gray-500">{p.fecha_envio ? new Date(p.fecha_envio).toLocaleDateString("es-CO") : "—"}</td>
                     <td className="px-5 py-3 text-sm">
-                      <Button variant="ghost" className="h-auto px-0 py-0 text-xs text-brand-700" onClick={() => navigate("/resultados")}>
+                      <Button
+                        variant="ghost"
+                        className="h-auto px-0 py-0 text-xs text-brand-700"
+                        onClick={() => navigate("/mi-postulacion")}
+                      >
                         Ver detalle
                       </Button>
                     </td>

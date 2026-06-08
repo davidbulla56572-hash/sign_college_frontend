@@ -1,9 +1,12 @@
+export type ConvocatoriaEstado = "BORRADOR" | "ACTIVA" | "CERRADA";
+
 export type ConvocatoriaSummary = {
   id_convocatoria: number;
   titulo: string;
   descripcion: string | null;
   fecha_inicio: string;
   fecha_cierre: string;
+  estado: ConvocatoriaEstado;
   activa: boolean;
 };
 
@@ -13,6 +16,7 @@ export type ConvocatoriaDetail = {
   descripcion: string | null;
   fecha_inicio: string;
   fecha_cierre: string;
+  estado: ConvocatoriaEstado;
   activa: boolean;
   creado_por: number;
   fecha_creacion: string;
@@ -31,5 +35,4 @@ export type ConvocatoriaUpdatePayload = {
   descripcion?: string | null;
   fecha_inicio?: string | null;
   fecha_cierre?: string | null;
-  activa?: boolean | null;
 };
