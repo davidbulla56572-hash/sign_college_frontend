@@ -6,7 +6,9 @@ import { Input } from "../../../components/ui/Input";
 import { registerSchema } from "../schemas/register.schema";
 
 type RegisterPayload = {
-  nombreCompleto: string;
+  nombre: string;
+  apellido: string;
+  cedula: string;
   email: string;
   password: string;
   confirmPassword: string;
@@ -19,7 +21,9 @@ type RegisterFormProps = {
 };
 
 const initialValues: RegisterPayload = {
-  nombreCompleto: "",
+  nombre: "",
+  apellido: "",
+  cedula: "",
   email: "",
   password: "",
   confirmPassword: "",
@@ -39,15 +43,37 @@ export function RegisterForm({ errorMessage, isPending, onSubmit }: RegisterForm
               {errorMessage}
             </div>
           ) : null}
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+            <Input
+              label="Nombre"
+              name="nombre"
+              type="text"
+              placeholder="Nombre"
+              value={values.nombre}
+              onBlur={handleBlur}
+              onChange={handleChange}
+              error={touched.nombre ? errors.nombre : undefined}
+            />
+            <Input
+              label="Apellido"
+              name="apellido"
+              type="text"
+              placeholder="Apellido"
+              value={values.apellido}
+              onBlur={handleBlur}
+              onChange={handleChange}
+              error={touched.apellido ? errors.apellido : undefined}
+            />
+          </div>
           <Input
-            label="Nombre Completo"
-            name="nombreCompleto"
+            label="Cedula"
+            name="cedula"
             type="text"
-            placeholder="Nombre Completo"
-            value={values.nombreCompleto}
+            placeholder="Numero de cedula"
+            value={values.cedula}
             onBlur={handleBlur}
             onChange={handleChange}
-            error={touched.nombreCompleto ? errors.nombreCompleto : undefined}
+            error={touched.cedula ? errors.cedula : undefined}
           />
           <Input
             label="Correo electronico"
@@ -63,7 +89,7 @@ export function RegisterForm({ errorMessage, isPending, onSubmit }: RegisterForm
             label="Contraseña"
             name="password"
             type="password"
-            placeholder="Contraseña"
+            placeholder="Minimo 8 caracteres"
             value={values.password}
             onBlur={handleBlur}
             onChange={handleChange}
@@ -73,7 +99,7 @@ export function RegisterForm({ errorMessage, isPending, onSubmit }: RegisterForm
             label="Confirmar Contraseña"
             name="confirmPassword"
             type="password"
-            placeholder="Confirmar Contraseña"
+            placeholder="Repite tu contraseña"
             value={values.confirmPassword}
             onBlur={handleBlur}
             onChange={handleChange}
@@ -81,7 +107,7 @@ export function RegisterForm({ errorMessage, isPending, onSubmit }: RegisterForm
           />
           <Button type="submit" className="w-full" disabled={isPending}>
             <UserPlus className="h-4 w-4" aria-hidden="true" />
-            {isPending ? "Creando cuenta..." : "Continuar"}
+            {isPending ? "Creando cuenta..." : "Crear cuenta"}
           </Button>
         </Form>
       )}

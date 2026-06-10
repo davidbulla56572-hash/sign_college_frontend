@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { Users, FileText, Trophy, CalendarDays } from "lucide-react";
 
 import { Card, PageContainer } from "../../../components/ui";
@@ -124,6 +125,7 @@ function AspirantesListPage() {
 }
 
 function PostulacionesAdminList() {
+  const navigate = useNavigate();
   const { data, isLoading } = useAllPostulacionesQuery();
 
   if (isLoading) {
@@ -203,6 +205,15 @@ function PostulacionesAdminList() {
                 {p.fecha_envio
                   ? new Date(p.fecha_envio).toLocaleDateString("es-CO")
                   : "—"}
+              </td>
+              <td className="px-5 py-3 text-sm">
+                <button
+                  type="button"
+                  className="text-brand-700 hover:text-brand-600 font-medium"
+                  onClick={() => navigate(`/admin/postulacion/${p.id_postulacion}`)}
+                >
+                  Ver revision
+                </button>
               </td>
             </tr>
           ))}

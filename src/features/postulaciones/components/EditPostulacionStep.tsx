@@ -4,13 +4,13 @@ import * as Yup from "yup";
 
 import { Button, Card } from "../../../components/ui";
 import {
-  useApplyMutation,
   useHojaVidaDraftQuery,
   useSaveDraftMutation,
 } from "../hooks/postulacion.hooks";
 import { PersonalInfoSection } from "../../hoja-vida/components/PersonalInfoSection";
 import { DynamicItemsSection } from "../../hoja-vida/components/DynamicItemsSection";
 import type { HojaVidaSavePayload } from "../../hoja-vida/types/hojaVida.types";
+import { PostulacionSummaryCard } from "./PostulacionSummaryCard";
 
 const hojaVidaSchema = Yup.object({
   datos_personales: Yup.object({
@@ -115,8 +115,7 @@ export function EditPostulacionStep({
 }: EditPostulacionStepProps) {
   const { data: draftData } = useHojaVidaDraftQuery(postulacionId);
   const saveMutation = useSaveDraftMutation(postulacionId);
-  const applyMutation = useApplyMutation(postulacionId);
-  const [draftSaved, setDraftSaved] = useState(false);
+  const [showSummary, setShowSummary] = useState(false);
 
   if (!draftData) {
     return (
@@ -145,31 +144,13 @@ export function EditPostulacionStep({
     },
   };
 
-  if (draftSaved) {
+  if (showSummary) {
     return (
-      <Card className="mt-4">
-        <h3 className="text-lg font-semibold text-ink">Datos guardados</h3>
-        <p className="mt-2 text-sm text-gray-600">
-          Tu informacion ha sido guardada correctamente. Puedes enviar tu postulacion cuando estes listo.
-        </p>
-        <div className="mt-5 flex gap-3">
-          <Button
-            type="button"
-            variant="secondary"
-            onClick={() => setDraftSaved(false)}
-          >
-            Seguir editando
-          </Button>
-          <Button
-            type="button"
-            variant="primary"
-            disabled={applyMutation.isPending}
-            onClick={() => applyMutation.mutate(undefined, { onSuccess: () => onApplied() })}
-          >
-            {applyMutation.isPending ? "Enviando..." : "Enviar postulacion"}
-          </Button>
-        </div>
-      </Card>
+      <PostulacionSummaryCard
+        postulacionId={postulacionId}
+        onBack={() => setShowSummary(false)}
+        onApplied={onApplied}
+      />
     );
   }
 
@@ -179,7 +160,7 @@ export function EditPostulacionStep({
       validationSchema={hojaVidaSchema}
       enableReinitialize
       onSubmit={(values) => {
-        saveMutation.mutate(values, { onSuccess: () => setDraftSaved(true) });
+        saveMutation.mutate(values, { onSuccess: () => setShowSummary(true) });
       }}
     >
       {({ isSubmitting }) => (
@@ -211,15 +192,7 @@ export function EditPostulacionStep({
                 variant="secondary"
                 disabled={isSubmitting || saveMutation.isPending}
               >
-                {saveMutation.isPending ? "Guardando..." : "Guardar borrador"}
-              </Button>
-              <Button
-                type="button"
-                variant="primary"
-                disabled={isSubmitting || applyMutation.isPending}
-                onClick={() => applyMutation.mutate(undefined, { onSuccess: () => onApplied() })}
-              >
-                {applyMutation.isPending ? "Enviando..." : "Enviar postulacion"}
+                {saveMutation.isPending ? "Guardando..." : "Guardar y revisar resumen"}
               </Button>
             </div>
           </Card>

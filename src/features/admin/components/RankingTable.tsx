@@ -1,4 +1,5 @@
 import { useMemo, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { ArrowUpDown, Search } from "lucide-react";
 
 import { cn } from "../../../lib/utils/cn";
@@ -41,6 +42,7 @@ export function RankingTable({
 }: {
   items: RankingEntry[];
 }) {
+  const navigate = useNavigate();
   const [search, setSearch] = useState("");
   const [filterEstado, setFilterEstado] = useState<string>("");
   const [sortField, setSortField] = useState<SortField>("puntaje");
@@ -182,7 +184,11 @@ export function RankingTable({
               </tr>
             ) : (
               filtered.map((entry, idx) => (
-                <tr key={entry.id_postulacion} className="hover:bg-gray-50">
+                <tr
+                  key={entry.id_postulacion}
+                  className="cursor-pointer hover:bg-gray-50"
+                  onClick={() => navigate(`/admin/postulacion/${entry.id_postulacion}`)}
+                >
                   <td className="px-5 py-3 text-sm font-semibold text-ink">
                     #{idx + 1}
                   </td>

@@ -21,6 +21,30 @@ export type ApplyResponse = {
   mensaje: string;
 };
 
+export type PostulacionFlowSummary = {
+  id_postulacion: number;
+  estado: string;
+  convocatoria: {
+    id_convocatoria: number;
+    titulo: string;
+  };
+  datos_personales: {
+    nombre: string;
+    apellido: string;
+    email: string | null;
+  };
+  resumen_items: {
+    formacion: number;
+    experiencia: number;
+    produccion: number;
+    ponencia: number;
+    investigacion: number;
+  };
+  lista_para_aplicar: boolean;
+  total_items: number;
+  tiene_cv_cargado: boolean;
+};
+
 export type HojaVidaDraftResponse = {
   id_postulacion: number;
   id_convocatoria: number;

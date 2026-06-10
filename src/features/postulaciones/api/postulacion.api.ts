@@ -3,6 +3,7 @@ import type {
   ActiveDraftResponse,
   ApplyResponse,
   HojaVidaDraftResponse,
+  PostulacionFlowSummary,
   PostulacionSummary,
 } from "../types/postulacion.types";
 import type {
@@ -26,6 +27,13 @@ export async function getHojaVidaDraft(
   const response = await httpClient.get(
     `/hoja-vida/postulaciones/${postulacionId}`
   );
+  return response.data;
+}
+
+export async function getPostulacionSummary(
+  postulacionId: number,
+): Promise<PostulacionFlowSummary> {
+  const response = await httpClient.get(`/postulaciones/mine/${postulacionId}/summary`);
   return response.data;
 }
 

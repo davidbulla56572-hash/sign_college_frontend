@@ -1,5 +1,4 @@
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { toast } from "react-toastify";
+import { useQuery } from "@tanstack/react-query";
 
 import { resultadosApi } from "../api/resultados.api";
 
@@ -17,27 +16,19 @@ export function useResultadoQuery(id: number) {
   });
 }
 
+export function usePostulacionStatusQuery(id: number) {
+  return useQuery({
+    queryKey: ["resultados", "status", id],
+    queryFn: () => resultadosApi.getStatus(id),
+  });
+}
+
+// -- Admin hooks (backward compat) --
+
 export function useAdminRankingQuery(convocatoriaId: number) {
   return useQuery({
     queryKey: ["resultados", "ranking", convocatoriaId],
     queryFn: () => resultadosApi.getRanking(convocatoriaId),
     enabled: convocatoriaId > 0,
-  });
-}
-
-export function useEvaluarMutation() {
-  const queryClient = useQueryClient();
-
-  return useMutation({
-    mutationFn: resultadosApi.evaluar,
-    onSuccess: () => {
-      void queryClient.invalidateQueries({ queryKey: ["resultados"] });
-      void queryClient.invalidateQueries({ queryKey: ["admin"] });
-      void queryClient.invalidateQueries({ queryKey: ["postulaciones"] });
-      toast.success("Evaluacion completada");
-    },
-    onError: () => {
-      toast.error("Error al evaluar la postulacion");
-    },
   });
 }

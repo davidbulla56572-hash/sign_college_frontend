@@ -3,6 +3,7 @@ import { Navigate, Route, Routes } from "react-router-dom";
 import { ProtectedRoute } from "./ProtectedRoute";
 import { PublicOnlyRoute } from "./PublicOnlyRoute";
 import { AdminPage } from "../../features/admin/pages/AdminPage";
+import { AdminPostulacionDetallePage } from "../../features/admin/pages/AdminPostulacionDetallePage";
 import { LoginPage } from "../../features/auth/pages/LoginPage";
 import { SignUpPage } from "../../features/auth/pages/SignUpPage";
 import { DashboardPage } from "../../features/dashboard/pages/DashboardPage";
@@ -28,6 +29,7 @@ export function AppRouter() {
           <Route path="/resultados" element={<ResultsPage />} />
           <Route element={<ProtectedRoute allowedRoles={["ADMIN"]} />}>
             <Route path="/admin" element={<AdminPage />} />
+            <Route path="/admin/postulacion/:id" element={<AdminPostulacionDetallePage />} />
           </Route>
         </Route>
       </Route>

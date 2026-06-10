@@ -8,6 +8,7 @@ import type {
   HojaVidaSavePayload,
   HojaVidaSectionKey,
 } from "../types/hojaVida.types";
+import { ItemSupportManager } from "./ItemSupportManager";
 
 type DynamicItemsSectionProps = {
   sectionKey: HojaVidaSectionKey;
@@ -40,6 +41,7 @@ export function DynamicItemsSection({
               variant="secondary"
               onClick={() =>
                 push({
+                  id_item: null,
                   descripcion: "",
                   institucion: null,
                   fecha_inicio: null,
@@ -134,6 +136,7 @@ export function DynamicItemsSection({
                         }}
                       />
                     </div>
+                    <ItemSupportManager itemId={item.id_item} />
                   </div>
                 );
               })}

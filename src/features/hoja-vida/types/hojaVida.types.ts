@@ -16,11 +16,22 @@ export type DatosPersonalesHojaVida = {
 };
 
 export type HojaVidaItem = {
+  id_item?: number | null;
   descripcion: string;
   institucion: string | null;
   fecha_inicio: string | null;
   fecha_fin: string | null;
   cantidad: number | null;
+};
+
+export type SoporteItem = {
+  id_soporte: number;
+  id_item: number;
+  nombre_archivo: string;
+  url_archivo: string;
+  tipo_archivo: string;
+  tamanio_bytes: number;
+  fecha_carga: string | null;
 };
 
 export type HojaVidaSectionKey =

@@ -1,48 +1,73 @@
-import { useState } from "react";
 import { ChevronDown, ChevronUp } from "lucide-react";
+import { useState } from "react";
 
-import { cn } from "../../../lib/utils/cn";
-import type { DetalleItemResultado } from "../api/resultados.api";
+import { PostulacionEstadoBadge } from "./PostulacionEstadoBadge";
+import { ResultadoHeaderCard } from "./ResultadoHeaderCard";
+import { ResultadoPuntajeCard } from "./ResultadoPuntajeCard";
+import { ResultadoResumenSection } from "./ResultadoResumenSection";
+import { ResultadoMensajeEstado } from "./ResultadoMensajeEstado";
+import type { MiResultado } from "../types/resultados.types";
 
-const tipoLabels: Record<string, string> = {
-  FORMACION: "Formacion academica",
-  EXPERIENCIA: "Experiencia profesional",
-  PRODUCCION: "Produccion academica",
-  PONENCIA: "Ponencias",
-  INVESTIGACION: "Investigacion",
-  DOCUMENTO: "Documentos",
-  OTRO: "Otros",
-};
+function DetalleTable({
+  detalle,
+}: {
+  detalle: MiResultado["detalle"];
+}) {
+  const tipoLabels: Record<string, string> = {
+    FORMACION: "Formacion academica",
+    EXPERIENCIA: "Experiencia profesional",
+    PRODUCCION: "Produccion academica",
+    PONENCIA: "Ponencias y conferencias",
+    INVESTIGACION: "Investigacion",
+    DOCUMENTO: "Documentos",
+    OTRO: "Otros",
+  };
 
-function GrupoTipo({
+  const grupos: Record<string, typeof detalle> = {};
+  for (const item of detalle) {
+    grupos[item.tipo_item] ??= [];
+    grupos[item.tipo_item].push(item);
+  }
+
+  return (
+    <div className="mt-4 space-y-2">
+      {Object.entries(grupos).map(([tipo, items]) => (
+        <GrupoDetalle
+          key={tipo}
+          tipo={tipoLabels[tipo] ?? tipo}
+          items={items}
+        />
+      ))}
+    </div>
+  );
+}
+
+function GrupoDetalle({
   tipo,
   items,
 }: {
   tipo: string;
-  items: DetalleItemResultado[];
+  items: MiResultado["detalle"];
 }) {
   const [expanded, setExpanded] = useState(false);
-  const totalPuntaje = items.reduce(
-    (sum, i) => sum + i.puntaje_asignado,
-    0,
-  );
+  const total = items.reduce((s, i) => s + i.puntaje_asignado, 0);
 
   return (
-    <div className="border-b border-gray-100 last:border-b-0">
+    <div className="rounded-lg border border-gray-200">
       <button
         type="button"
         className="flex w-full items-center justify-between px-4 py-3 text-left hover:bg-gray-50"
         onClick={() => setExpanded(!expanded)}
       >
         <div className="flex items-center gap-3">
-          <span className="text-sm font-medium text-ink">
-            {tipoLabels[tipo] ?? tipo}
+          <span className="text-sm font-medium text-ink">{tipo}</span>
+          <span className="text-xs text-gray-400">
+            {items.length} {items.length === 1 ? "item" : "items"}
           </span>
-          <span className="text-xs text-gray-400">{items.length} items</span>
         </div>
         <div className="flex items-center gap-3">
           <span className="text-sm font-semibold text-brand-700">
-            {totalPuntaje.toFixed(2)} pts
+            {total.toFixed(2)} pts
           </span>
           {expanded ? (
             <ChevronUp className="h-4 w-4 text-gray-400" />
@@ -52,7 +77,7 @@ function GrupoTipo({
         </div>
       </button>
       {expanded && (
-        <div className="bg-gray-50 px-4 py-2">
+        <div className="border-t border-gray-100 bg-gray-50 px-4 py-2">
           <table className="w-full text-xs">
             <thead>
               <tr className="text-gray-500">
@@ -77,116 +102,47 @@ function GrupoTipo({
   );
 }
 
-export function ResultadoDetalle({
-  detalle,
-}: {
-  detalle: DetalleItemResultado[];
-}) {
-  if (detalle.length === 0) return null;
-
-  // Group by tipo_item
-  const grupos: Record<string, DetalleItemResultado[]> = {};
-  for (const item of detalle) {
-    grupos[item.tipo_item] ??= [];
-    grupos[item.tipo_item].push(item);
-  }
+export function ResultadoCard({ resultado }: { resultado: MiResultado }) {
+  const [showDetalle, setShowDetalle] = useState(false);
+  const hasEvaluation = resultado.puntaje_total != null;
 
   return (
-    <div className="mt-4 rounded-md border border-gray-200">
-      <div className="px-4 py-2 bg-gray-50 text-xs font-medium uppercase tracking-wider text-gray-500">
-        Detalle de evaluacion
+    <div className="space-y-4 rounded-xl border border-gray-200 bg-white p-6 shadow-soft">
+      {/* Header + Puntaje */}
+      <div className="grid gap-4 sm:grid-cols-[1fr_auto]">
+        <ResultadoHeaderCard
+          titulo={resultado.convocatoria.titulo}
+          estado={resultado.estado_label}
+          estadoColor={resultado.estado_color}
+          fechaEvaluacion={resultado.fecha_evaluacion}
+        />
+        {hasEvaluation && (
+          <ResultadoPuntajeCard puntaje={resultado.puntaje_total} />
+        )}
       </div>
-      {Object.entries(grupos).map(([tipo, items]) => (
-        <GrupoTipo key={tipo} tipo={tipo} items={items} />
-      ))}
-    </div>
-  );
-}
 
-const estadoLabels: Record<string, string> = {
-  BORRADOR: "Borrador",
-  ENVIADA: "Enviada",
-  EN_EVALUACION: "En evaluacion",
-  EVALUADA: "Evaluada",
-  RECHAZADA: "Rechazada",
-};
+      {/* Mensaje contextual */}
+      <ResultadoMensajeEstado
+        mensaje={resultado.mensaje_contextual}
+        color={resultado.estado_color}
+      />
 
-const estadoColors: Record<string, string> = {
-  BORRADOR: "bg-gray-100 text-gray-600",
-  ENVIADA: "bg-blue-50 text-blue-700",
-  EN_EVALUACION: "bg-amber-50 text-amber-700",
-  EVALUADA: "bg-green-50 text-green-700",
-  RECHAZADA: "bg-red-50 text-red-700",
-};
-
-export function ResultadoEstadoBadge({ estado }: { estado: string }) {
-  return (
-    <span
-      className={cn(
-        "rounded-full px-2 py-0.5 text-xs font-medium",
-        estadoColors[estado] ?? "bg-gray-100 text-gray-600",
+      {/* Resumen por categoria (solo si hay evaluacion) */}
+      {hasEvaluation && resultado.resumen_evaluacion.length > 0 && (
+        <ResultadoResumenSection resumen={resultado.resumen_evaluacion} />
       )}
-    >
-      {estadoLabels[estado] ?? estado}
-    </span>
-  );
-}
 
-export function ResultadoCard({
-  resultado,
-}: {
-  resultado: {
-    id_postulacion: number;
-    estado: string;
-    puntaje_total: number | null;
-    fecha_evaluacion: string | null;
-    convocatoria: { titulo: string };
-    detalle: DetalleItemResultado[];
-  };
-}) {
-  const [expanded, setExpanded] = useState(false);
-
-  return (
-    <div className="rounded-lg border border-gray-200 bg-white p-5 shadow-soft">
-      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-        <div>
-          <h3 className="text-base font-semibold text-ink">
-            {resultado.convocatoria.titulo}
-          </h3>
-          <div className="mt-1 flex items-center gap-3">
-            <ResultadoEstadoBadge estado={resultado.estado} />
-            {resultado.fecha_evaluacion && (
-              <span className="text-xs text-gray-400">
-                Evaluado el{" "}
-                {new Date(resultado.fecha_evaluacion).toLocaleDateString(
-                  "es-CO",
-                )}
-              </span>
-            )}
-          </div>
-        </div>
-        <div className="text-right">
-          <p className="text-xs text-gray-500">Puntaje total</p>
-          <p className="text-2xl font-bold text-brand-700">
-            {resultado.puntaje_total != null
-              ? resultado.puntaje_total.toFixed(2)
-              : "—"}
-          </p>
-        </div>
-      </div>
-
+      {/* Detalle expandible */}
       {resultado.detalle.length > 0 && (
-        <>
-          <button
-            type="button"
-            className="mt-3 text-sm font-medium text-brand-700 hover:text-brand-600"
-            onClick={() => setExpanded(!expanded)}
-          >
-            {expanded ? "Ocultar detalle" : "Ver detalle de evaluacion"}
-          </button>
-          {expanded && <ResultadoDetalle detalle={resultado.detalle} />}
-        </>
+        <button
+          type="button"
+          className="text-sm font-medium text-brand-700 transition hover:text-brand-600"
+          onClick={() => setShowDetalle(!showDetalle)}
+        >
+          {showDetalle ? "Ocultar detalle" : "Ver detalle de evaluacion"}
+        </button>
       )}
+      {showDetalle && <DetalleTable detalle={resultado.detalle} />}
     </div>
   );
 }

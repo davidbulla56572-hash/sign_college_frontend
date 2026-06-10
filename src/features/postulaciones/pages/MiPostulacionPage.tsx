@@ -7,6 +7,22 @@ import { useMyPostulacionesQuery, useCreateDraftMutation, useHojaVidaDraftQuery 
 import { UploadCvStep } from "../components/UploadCvStep";
 import { EditPostulacionStep } from "../components/EditPostulacionStep";
 
+const estadoLabels: Record<string, string> = {
+  BORRADOR: "Borrador",
+  ENVIADA: "Enviada",
+  EN_EVALUACION: "En evaluacion",
+  EVALUADA: "Evaluada",
+  RECHAZADA: "Rechazada",
+};
+
+const estadoColors: Record<string, string> = {
+  BORRADOR: "text-gray-600",
+  ENVIADA: "text-blue-700",
+  EN_EVALUACION: "text-amber-700",
+  EVALUADA: "text-emerald-700",
+  RECHAZADA: "text-red-700",
+};
+
 export function MiPostulacionPage() {
   const navigate = useNavigate();
   const { data: activaResp, isLoading: loadingActiva } = useConvocatoriaActivaQuery();
@@ -68,6 +84,7 @@ function PostulacionFlow({
     id_postulacion: number;
     id_convocatoria: number;
     estado: string;
+    puntaje_total: number | null;
     fecha_envio: string | null;
   }>;
   convocatoriaId: number;
@@ -75,21 +92,124 @@ function PostulacionFlow({
   const navigate = useNavigate();
   const createDraftMutation = useCreateDraftMutation();
 
-  const draft = postulaciones.find(
-    (p) =>
-      p.id_convocatoria === convocatoriaId &&
-      p.estado !== "EVALUADA" &&
-      p.estado !== "RECHAZADA"
+  // Find the user's postulation for the active convocatoria (any state)
+  const miPostulacion = postulaciones.find(
+    (p) => p.id_convocatoria === convocatoriaId
   );
 
-  // Check if the draft has a CV uploaded
-  const { data: hojaVidaDraft, isLoading: loadingDraft } = useHojaVidaDraftQuery(
-    draft?.id_postulacion ?? null
-  );
+  if (!miPostulacion) {
+    // No postulation yet — show "Postularse" button
+    return (
+      <PageContainer>
+        <ConvocatoriaHeader
+          titulo={convocatoriaTitulo}
+          descripcion={convocatoriaDescripcion}
+          fechaInicio={fechaInicio}
+          fechaCierre={fechaCierre}
+        />
+        <Card className="mt-4">
+          <h3 className="text-lg font-semibold text-ink">Iniciar postulacion</h3>
+          <p className="mt-2 text-sm text-gray-600">
+            Al postularte, podras cargar tu hoja de vida y el sistema la procesara automaticamente.
+          </p>
+          <Button
+            type="button"
+            variant="primary"
+            className="mt-4"
+            disabled={createDraftMutation.isPending}
+            onClick={() => createDraftMutation.mutate()}
+          >
+            Postularse
+          </Button>
+        </Card>
+      </PageContainer>
+    );
+  }
 
-  const isEnviada = draft?.estado === "ENVIADA";
+  // Postulation exists — handle by state
+  const estado = miPostulacion.estado;
 
-  if (loadingDraft || createDraftMutation.isPending) {
+  // EVALUADA or RECHAZADA: show final state with link to results
+  if (estado === "EVALUADA" || estado === "RECHAZADA") {
+    return (
+      <PageContainer>
+        <ConvocatoriaHeader
+          titulo={convocatoriaTitulo}
+          descripcion={convocatoriaDescripcion}
+          fechaInicio={fechaInicio}
+          fechaCierre={fechaCierre}
+        />
+        <Card className="mt-4">
+          <h3 className="text-lg font-semibold text-ink">Tu postulacion</h3>
+          <p className="mt-2 text-sm text-gray-600">
+            Estado:{" "}
+            <span className={`font-medium ${estadoColors[estado] ?? "text-ink"}`}>
+              {estadoLabels[estado] ?? estado}
+            </span>
+          </p>
+          {miPostulacion.puntaje_total != null && (
+            <p className="mt-1 text-sm text-gray-500">
+              Puntaje:{" "}
+              <span className="font-semibold text-brand-700">
+                {miPostulacion.puntaje_total.toFixed(2)}
+              </span>
+            </p>
+          )}
+          <Button
+            type="button"
+            variant="primary"
+            className="mt-4"
+            onClick={() => navigate("/resultados")}
+          >
+            Ver mis resultados
+          </Button>
+        </Card>
+      </PageContainer>
+    );
+  }
+
+  // EN_EVALUACION: show waiting message
+  if (estado === "EN_EVALUACION") {
+    return (
+      <PageContainer>
+        <ConvocatoriaHeader
+          titulo={convocatoriaTitulo}
+          descripcion={convocatoriaDescripcion}
+          fechaInicio={fechaInicio}
+          fechaCierre={fechaCierre}
+        />
+        <Card className="mt-4">
+          <h3 className="text-lg font-semibold text-ink">Tu postulacion</h3>
+          <p className="mt-2 text-sm text-gray-600">
+            Estado:{" "}
+            <span className="font-medium text-amber-700">En evaluacion</span>
+          </p>
+          <p className="mt-2 text-sm text-gray-500">
+            Tu postulacion esta siendo evaluada. Pronto podras consultar tu resultado.
+          </p>
+        </Card>
+      </PageContainer>
+    );
+  }
+
+  // BORRADOR or ENVIADA: show the active flow
+  return <DraftPostulacionFlow postulacionId={miPostulacion.id_postulacion} estado={estado} />;
+}
+
+function DraftPostulacionFlow({
+  postulacionId,
+  estado,
+}: {
+  postulacionId: number;
+  estado: string;
+}) {
+  const navigate = useNavigate();
+  const { data: hojaVidaDraft, isLoading: loadingDraft } =
+    useHojaVidaDraftQuery(postulacionId);
+
+  const isEnviada = estado === "ENVIADA";
+
+  if (loadingDraft) {
     return (
       <PageContainer>
         <div className="flex items-center justify-center py-12">
@@ -102,22 +222,10 @@ function PostulacionFlow({
   if (isEnviada) {
     return (
       <PageContainer>
-        <ConvocatoriaHeader
-          titulo={convocatoriaTitulo}
-          descripcion={convocatoriaDescripcion}
-          fechaInicio={fechaInicio}
-          fechaCierre={fechaCierre}
-        />
-        <Card className="mt-4">
+        <Card>
           <h3 className="text-lg font-semibold text-ink">Postulacion enviada</h3>
           <p className="mt-2 text-sm text-gray-600">
             Tu postulacion ha sido enviada correctamente. Podras consultar los resultados cuando el administrador complete la evaluacion.
-          </p>
-          <p className="mt-2 text-sm text-gray-500">
-            Estado: <span className="font-medium text-blue-700">ENVIADA</span>
-            {draft.fecha_envio && (
-              <> · Enviada el {new Date(draft.fecha_envio).toLocaleDateString("es-CO")}</>
-            )}
           </p>
           <Button
             type="button"
@@ -132,71 +240,24 @@ function PostulacionFlow({
     );
   }
 
-  if (draft) {
-    // Draft exists — check if CV was uploaded
-    const hasCv = hojaVidaDraft?.url_cv_original != null;
+  // BORRADOR: check if CV uploaded
+  const hasCv = hojaVidaDraft?.url_cv_original != null;
 
-    if (!hasCv) {
-      // No CV yet — show upload step
-      return (
-        <PageContainer>
-          <ConvocatoriaHeader
-            titulo={convocatoriaTitulo}
-            descripcion={convocatoriaDescripcion}
-            fechaInicio={fechaInicio}
-            fechaCierre={fechaCierre}
-          />
-          <UploadCvStep
-            postulacionId={draft.id_postulacion}
-            onUploadComplete={() => {
-              // After upload, page will re-render and show edit step
-            }}
-          />
-        </PageContainer>
-      );
-    }
-
-    // CV uploaded — show edit step
+  if (!hasCv) {
     return (
       <PageContainer>
-        <ConvocatoriaHeader
-          titulo={convocatoriaTitulo}
-          descripcion={convocatoriaDescripcion}
-          fechaInicio={fechaInicio}
-          fechaCierre={fechaCierre}
-        />
-        <EditPostulacionStep
-          postulacionId={draft.id_postulacion}
-          onApplied={() => navigate("/resultados")}
-        />
+        <UploadCvStep postulacionId={postulacionId} onUploadComplete={() => {}} />
       </PageContainer>
     );
   }
 
-  // No draft — show "Postularse" button
+  // CV uploaded — show edit step
   return (
     <PageContainer>
-      <ConvocatoriaHeader
-        titulo={convocatoriaTitulo}
-        descripcion={convocatoriaDescripcion}
-        fechaInicio={fechaInicio}
-        fechaCierre={fechaCierre}
+      <EditPostulacionStep
+        postulacionId={postulacionId}
+        onApplied={() => navigate("/mi-postulacion", { replace: true })}
       />
-      <Card className="mt-4">
-        <h3 className="text-lg font-semibold text-ink">Iniciar postulacion</h3>
-        <p className="mt-2 text-sm text-gray-600">
-          Al postularte, podras cargar tu hoja de vida y el sistema la procesara automaticamente.
-        </p>
-        <Button
-          type="button"
-          variant="primary"
-          className="mt-4"
-          disabled={createDraftMutation.isPending}
-          onClick={() => createDraftMutation.mutate()}
-        >
-          Postularse
-        </Button>
-      </Card>
     </PageContainer>
   );
 }

@@ -1,27 +1,12 @@
 import { httpClient } from "../../../lib/api/httpClient";
+import type {
+  MiResultado,
+  PostulacionStatus,
+} from "../types/resultados.types";
 
-type DetalleItemResultado = {
-  id_item: number;
-  tipo_item: string;
-  descripcion: string;
-  puntaje_asignado: number;
-};
+// -- Admin types (backward compat) --
 
-type ConvocatoriaRef = {
-  id_convocatoria: number;
-  titulo: string;
-};
-
-type MiResultado = {
-  id_postulacion: number;
-  estado: string;
-  puntaje_total: number | null;
-  fecha_evaluacion: string | null;
-  convocatoria: ConvocatoriaRef;
-  detalle: DetalleItemResultado[];
-};
-
-type RankingEntry = {
+export type RankingEntry = {
   id_postulacion: number;
   id_usuario: number;
   aspirante: string;
@@ -32,19 +17,11 @@ type RankingEntry = {
   fecha_evaluacion: string | null;
 };
 
-type RankingResponse = {
+export type RankingResponse = {
   id_convocatoria: number;
   titulo_convocatoria: string;
   items: RankingEntry[];
   total: number;
-};
-
-export type {
-  DetalleItemResultado,
-  ConvocatoriaRef,
-  MiResultado,
-  RankingEntry,
-  RankingResponse,
 };
 
 export const resultadosApi = {
@@ -52,8 +29,12 @@ export const resultadosApi = {
     httpClient.get("/resultados/mis-resultados").then((r) => r.data),
 
   getById: (id: number): Promise<MiResultado> =>
-    httpClient.get(`/resultados/${id}`).then((r) => r.data),
+    httpClient.get(`/resultados/postulaciones/${id}`).then((r) => r.data),
 
+  getStatus: (id: number): Promise<PostulacionStatus> =>
+    httpClient.get(`/resultados/postulaciones/${id}/status`).then((r) => r.data),
+
+  // Admin (legacy)
   getRanking: (convocatoriaId: number): Promise<RankingResponse> =>
     httpClient
       .get(`/resultados/ranking/${convocatoriaId}`)

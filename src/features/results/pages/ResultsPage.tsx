@@ -1,16 +1,28 @@
-import { PageContainer } from "../../../components/ui";
-import { useMisResultadosQuery } from "../../resultados/hooks/resultados.hooks";
+import { ErrorState, PageContainer, Spinner } from "../../../components/ui";
 import { ResultadoCard } from "../../resultados/components/ResultadoCard";
+import { ResultadoEmptyState } from "../../resultados/components/ResultadoEmptyState";
+import { useMisResultadosQuery } from "../../resultados/hooks/resultados.hooks";
 
 export function ResultsPage() {
-  const { data, isLoading } = useMisResultadosQuery();
+  const { data, isLoading, isError } = useMisResultadosQuery();
 
   if (isLoading) {
     return (
       <PageContainer>
-        <div className="flex items-center justify-center py-12">
-          <p className="text-sm text-gray-500">Cargando resultados...</p>
+        <div className="flex flex-col items-center justify-center py-16">
+          <Spinner label="Cargando tus resultados" />
         </div>
+      </PageContainer>
+    );
+  }
+
+  if (isError) {
+    return (
+      <PageContainer>
+        <ErrorState
+          title="Error al cargar resultados"
+          description="No pudimos cargar tus resultados. Intenta de nuevo en unos momentos."
+        />
       </PageContainer>
     );
   }
@@ -18,29 +30,21 @@ export function ResultsPage() {
   if (!data || data.length === 0) {
     return (
       <PageContainer>
-        <div className="rounded-lg border border-gray-200 bg-white p-8 text-center shadow-soft">
-          <h3 className="text-base font-semibold text-ink">
-            Sin resultados disponibles
-          </h3>
-          <p className="mt-2 text-sm leading-6 text-gray-600">
-            No hay postulaciones evaluadas. Cuando tu postulacion sea evaluada,
-            aqui veras el puntaje y desglose detallado.
-          </p>
-        </div>
+        <ResultadoEmptyState />
       </PageContainer>
     );
   }
 
   return (
     <PageContainer>
-      <div>
+      <div className="mb-6">
         <h2 className="text-xl font-semibold text-ink">Mis resultados</h2>
         <p className="mt-1 text-sm text-gray-500">
-          Puntaje y desglose de evaluacion por postulacion
+          Estado y puntaje de tus postulaciones a convocatorias docentes
         </p>
       </div>
 
-      <div className="space-y-4">
+      <div className="space-y-5">
         {data.map((result) => (
           <ResultadoCard key={result.id_postulacion} resultado={result} />
         ))}

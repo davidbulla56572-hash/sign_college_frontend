@@ -5,7 +5,9 @@ import { toast } from "react-toastify";
 import { httpClient } from "../../../lib/api/httpClient";
 
 type RegisterPayload = {
-  nombreCompleto: string;
+  nombre: string;
+  apellido: string;
+  cedula: string;
   email: string;
   password: string;
 };
@@ -16,11 +18,11 @@ export function useRegisterMutation() {
   return useMutation({
     mutationFn: async (values: RegisterPayload) => {
       const { data } = await httpClient.post("/auth/register", {
-        nombre: values.nombreCompleto.split(" ")[0] ?? "",
-        apellido: values.nombreCompleto.split(" ").slice(1).join(" ") ?? "",
+        nombre: values.nombre,
+        apellido: values.apellido,
+        cedula: values.cedula,
         email: values.email,
         password: values.password,
-        rol: "ASPIRANTE",
       });
       return data;
     },

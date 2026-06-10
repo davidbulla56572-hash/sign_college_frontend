@@ -5,6 +5,7 @@ import {
   applyPostulacion,
   createOrRecoverDraft,
   getHojaVidaDraft,
+  getPostulacionSummary,
   listMyPostulaciones,
   saveHojaVidaDraft,
   uploadCvWithinPostulacion,
@@ -40,6 +41,14 @@ export function useHojaVidaDraftQuery(postulacionId: number | null) {
   });
 }
 
+export function usePostulacionSummaryQuery(postulacionId: number | null) {
+  return useQuery({
+    queryKey: ["postulaciones", "summary", postulacionId],
+    queryFn: () => getPostulacionSummary(postulacionId!),
+    enabled: postulacionId != null,
+  });
+}
+
 export function useUploadCvMutation(postulacionId: number) {
   const queryClient = useQueryClient();
 
@@ -48,6 +57,9 @@ export function useUploadCvMutation(postulacionId: number) {
     onSuccess: (data) => {
       void queryClient.invalidateQueries({
         queryKey: ["hoja-vida", "draft", postulacionId],
+      });
+      void queryClient.invalidateQueries({
+        queryKey: ["postulaciones", "summary", postulacionId],
       });
       if (data.metadata_extraccion.origen !== "gemini") {
         const warning =
@@ -79,6 +91,9 @@ export function useSaveDraftMutation(postulacionId: number) {
       void queryClient.invalidateQueries({
         queryKey: ["hoja-vida", "draft", postulacionId],
       });
+      void queryClient.invalidateQueries({
+        queryKey: ["postulaciones", "summary", postulacionId],
+      });
       toast.success(data.message ?? "Datos guardados correctamente");
     },
     onError: () => {
@@ -94,6 +109,9 @@ export function useApplyMutation(postulacionId: number) {
     mutationFn: () => applyPostulacion(postulacionId),
     onSuccess: (data) => {
       void queryClient.invalidateQueries({ queryKey: ["postulaciones"] });
+      void queryClient.invalidateQueries({
+        queryKey: ["postulaciones", "summary", postulacionId],
+      });
       void queryClient.invalidateQueries({
         queryKey: ["hoja-vida", "draft", postulacionId],
       });
